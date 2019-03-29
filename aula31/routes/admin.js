@@ -13,7 +13,17 @@ router.get("/posts",function(req,res){
 })
 
 router.get("/categorias",function(req,res){
-  res.render("admin/categorias")
+  Categoria.find().
+  then(function(categorias){
+     res.render("admin/categorias",{
+       categorias:categorias
+     })
+  })
+  .catch(function(error){
+    req.flash("error_msg","Houve um erro ao entra na categorias")
+    console.log("Erro: "+error)
+    res.redirect("/admin/")
+  })
 })
 
 router.get("/categorias/add",function(req,res){
