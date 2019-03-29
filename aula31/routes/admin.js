@@ -33,7 +33,7 @@ router.post("/categorias/nova",function(req,res){
     })
   }
   
-  if(nome.length < 4){
+  if(nome.length >0 && nome.length< 3){
     erros.push({
       texto:"Nome da categoria muito pequeno"
     })
@@ -55,14 +55,14 @@ router.post("/categorias/nova",function(req,res){
       nome,
       slug
     }
-  
-    new Categoria(novaCategoria).save().
+    new Categoria(novaCategoria).save().//Salvando no Db
     then(function(){
-      console.log("Categoria sucesso")
+      req.flash('success_msg',"Categoria salva com sucesso");
     }).catch(function(error){
+      req.flash("error_msg","Houve um erro ao criar a categoria,tente novamente mais tarde")
       console.log("erro: "+error)
     })
-  
+    res.redirect("/admin/categorias");
   }
 })
 
