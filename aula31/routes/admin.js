@@ -55,6 +55,8 @@ router.post("/categorias/nova",function(req,res){
       nome,
       slug
     }
+    //Dados a serem salvos 
+    
     new Categoria(novaCategoria).save().//Salvando no Db
     then(function(){
       req.flash('success_msg',"Categoria salva com sucesso");
@@ -62,7 +64,9 @@ router.post("/categorias/nova",function(req,res){
       req.flash("error_msg","Houve um erro ao criar a categoria,tente novamente mais tarde")
       console.log("erro: "+error)
     })
+    
     res.redirect("/admin/categorias");
+
   }
 })
 

@@ -26,7 +26,6 @@
       next();
     })
     
-    
   //body-parser
     app.use(bodyParser.urlencoded({extended:true}))
     app.use(bodyParser.json())
@@ -45,10 +44,12 @@
     })
     
   //Public
-    app.use(express.static(path.join(__dirname,"public/") )) //Onde os arquivos js,e css se encontram
+    app.use(express.static(path.join(__dirname,"public/") ))
+    //Onde os arquivos js,e css se encontram
     
 
 //Rotas
+  //Rotas do Caminho normal
   app.get("/",function(req,res){
     res.send("Rota Principal")
   })
@@ -57,7 +58,11 @@
     res.send("Lista de Posts")
   })
   
-
+  app.get("/categorias",function(req,res){
+    res.send("Lista de Categorias")
+  })
+  
+  //Rotas do caminhos Admin
   app.use("/admin",admin);
   
   
