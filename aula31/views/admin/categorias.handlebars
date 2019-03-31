@@ -12,6 +12,14 @@
     <div class="card-body">
       <h4>Nome {{nome}}</h4>
       <small>Slug {{slug}}</small>
+      
+      <div class="links">
+        <a href="/admin/categorias/editar/{{_id}}">
+          <button class="btn btn-warning">
+            Editar Categoria
+          </button>
+        </a>
+      </div>
     </div>
   </div>
 {{/each}}
