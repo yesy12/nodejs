@@ -67,7 +67,7 @@
   
   
 //Outros
-  const port = 8000; 
+  const port = 9000; 
   app.listen(port,function(){
     console.log("Rodando na porta "+port)
   })
