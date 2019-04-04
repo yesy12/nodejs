@@ -7,10 +7,11 @@
 </a>
 
 <h3 class="mt-2">Categorias Criadas</h3>
+
 {{#each categorias}}
   <div class="card mt-3">
     <div class="card-body">
-      <h4>Categoria: {{nome}}</h4>
+      <h4>{{nome}}</h4>
       <small>Slug {{slug}}</small>
       
       <div class="links">
@@ -20,6 +21,13 @@
           </button>
         </a>
       </div>
+      
+    </div>
+  </div>
+{{else}}
+  <div class="card mt-3">
+    <div class="card-body">
+      <h4>Sem Categorias </h4>
     </div>
   </div>
 {{/each}}
