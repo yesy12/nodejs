@@ -72,7 +72,7 @@ router.post("/postagens/nova",function(req,res){
   }
   
   //CategoriaPostagem
-  if(!categoriaPostagem || typeof categoriaPostagem == undefined || categoriaPostagem == null){
+  if(!categoriaPostagem || typeof categoriaPostagem == undefined || categoriaPostagem == null || categoriaPostagem == "sem-categorias"){
       erros.push({
         texto:"Categoria Inválida"
     })
@@ -152,7 +152,8 @@ router.post("/postagens/nova",function(req,res){
     const novaPostagem = {
       titulo,
       categoria: categoriaPostagem,
-      slug: slugPostagemCompleto,
+      slug:slugPostagem,
+      slugCompleto: slugPostagemCompleto,
       descricao: descricaoPostagem,
       conteudo: conteudoPostagem
     }
@@ -164,6 +165,170 @@ router.post("/postagens/nova",function(req,res){
     })
     .catch(function(error){
       req.flash("error_msg","Houve um erro ao salvar a postagem")
+      console.log("erro: "+error)
+      res.redirect("/admin/postagens")
+    })
+  }
+  
+})
+
+router.get("/postagens/editar/:id/:slug",function(req,res){
+  Postagem.findOne({
+    _id:req.params.id,
+    slug:req.params.slug
+  })
+  
+  .then(function(postagem){
+    console.log(postagem)
+    Categoria.find().sort({
+      data:"desc"
+    })
+    .then(function(categorias){
+      res.render("admin/edit-postagens",{
+        postagem:postagem,
+        categorias:categorias
+      })
+    })
+    .catch(function(error){
+      req.flash("error_msg","Houve um erro ao editar a postagem")
+      res.redirect("admin/postagens")
+    })
+
+  })
+  .catch(function(error){
+    req.flash("error_msg","Essa categoria não existe")
+    res.redirect("/admin/postagens")
+  })
+  
+})
+
+router.post("/postagens/edita",function(req,res){
+  
+  const titulo = req.body.titulo;
+  const categoriaPostagem = req.body.categoriaPostagem;
+  const slugPostagem = req.body.slugPostagem;
+  const slugPostagemCompleto = req.body.slugPostagemCompleto;
+  const descricaoPostagem = req.body.descricaoPostagem;
+  const conteudoPostagem = req.body.conteudoPostagem;
+  
+  var erros = [];
+  
+  //Titulo
+  if(!titulo || typeof titulo == undefined || titulo == null){
+    erros.push({
+      texto:"Título Inválido"
+    })
+  }
+  
+  if(titulo.length > 0 && titulo.length < 10){
+    erros.push({
+      texto:"Título muito pequeno"
+    })  
+  }
+  
+  //CategoriaPostagem
+  if(!categoriaPostagem || typeof categoriaPostagem == undefined || categoriaPostagem == null || categoriaPostagem == "sem-categorias"){
+      erros.push({
+        texto:"Categoria Inválida"
+    })
+  }
+  
+    Categoria.find({
+      slug:categoriaPostagem
+    })
+    .then(function(categoria){
+      
+    })
+    .catch(function(error){
+      erros.push({
+        texto:"Categoria não existe"
+      })
+    })
+  
+  //slugPostagem
+  if(!slugPostagem || typeof slugPostagem == undefined || slugPostagem == null){
+    erros.push({
+      texto:"Slug da Postagem Inválido"
+    })
+  }
+  
+  if(slugPostagem.length >0 && slugPostagem.length < 10){
+    erros.push({
+      texto:"Slug da postagem muito pequeno"
+    })  
+  }
+  
+  //slugPostagemCompleto
+  var verificarSlug = categoriaPostagem + "/" + slugPostagem
+  if(verificarSlug != slugPostagemCompleto){
+    erros.push({
+      texto:"O slug deve se digitado corretamente,com letras minusculas e com - entre os espaços"
+    })
+  }
+  
+  //DescricaoPostagem
+  if(!descricaoPostagem || typeof descricaoPostagem == undefined || descricaoPostagem == null){
+    erros.push({
+      texto:"Descrição da Postagem Inválido"
+    })
+  }
+  
+  if(descricaoPostagem.length >0 && descricaoPostagem.length < 10){
+    erros.push({
+      texto:"Descrição da postagem muito pequeno"
+    })  
+  }
+  
+  //ConteudoPostagem
+  if(!conteudoPostagem || typeof conteudoPostagem == undefined || conteudoPostagem == null){
+    erros.push({
+      texto:"Conteudo da Postagem Inválido"
+    })
+  }
+  
+  if(conteudoPostagem.length >0 && conteudoPostagem.length < 10){
+    erros.push({
+      texto:"Conteudo da postagem muito pequeno"
+    })  
+  }
+  
+  if(erros.length > 0){
+    Categoria.find().sort({
+      date:"desc"
+    })
+    .then(function(categorias){
+      res.render("admin/add-postagens",{
+        erros,
+        categorias,
+      })
+    })
+  }
+  else{
+    Postagem.findOne({
+      _id:req.body.id,
+      slug:req.body.slug
+    })
+    .then(function(postagem){
+    //  postagem.titulo= titulo;
+      postagem.categoria = categoriaPostagem;
+      postagem.slug = slugPostagem;
+      postagem.slugCompleto = slugPostagemCompleto;
+      postagem.descricao = descricaoPostagem;
+      postagem.conteudo = conteudoPostagem;
+    
+      postagem.save()  
+      .then(function(){
+        req.flash("success_msg","Postagem editada com sucesso")
+        res.redirect("/admin/postagens")
+      })
+      .catch(function(error){
+        req.flash("error_msg","Houve um erro ao editar a postagem")
+        console.log("erro: "+error)
+        res.redirect("/admin/postagens")
+      })
+    })
+    .catch(function(error){
+      req.flash("error_msg","Houve um erro ao editar a postagem")
       console.log("erro: "+error)
       res.redirect("/admin/postagens")
     })
