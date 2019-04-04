@@ -140,10 +140,77 @@ router.post("/categorias/edit",function(req,res){
       categoria.nome = nome
       categoria.slug = slug
       
-      req.flash("success_msg","Editado com sucesso")
-      res.redirect("/admin/categorias")
+      categoria.save().then(function(){
+        req.flash("success_msg","Editado com sucesso")
+        res.redirect("/admin/categorias")
+      })
+      .catch(function(error){
+        req.flash("error_msg","Houve um erro ao salvar a edição")
+        res.redirect("/admin/categorias")
+      })
     }).catch(function(error){
       req.flash("error_msg","Houve um erro ao editar")
+      res.redirect("/admin/categorias")
+    })
+  }
+})
+
+router.get("/categorias/delete/:id",function(req,res){
+  Categoria.findOne({
+    _id:req.params.id
+  }).
+  then(function(categoria){
+    res.render("admin/delete-categorias",{
+      categoria:categoria
+    })
+  })
+  .catch(function(error){
+    req.flash("error_msg","Provavelmente essa categoria não existe")
+    res.redirect("admin/categorias")
+  })
+})
+
+router.post("/categorias/delete",function(req,res){
+  const id = req.body.id
+  const excluir = req.body.excluir
+  
+  var erros = [];
+  
+  if(excluir == "nao"){
+    req.flash("error_msg","Categoria não foi apagada")
+    res.redirect("/admin/categorias")
+  }
+  else if(excluir == null || !excluir || typeof excluir == undefined){
+    erros.push({
+      texto:"Decisão excluir invalida"
+    })
+  }
+  
+  if(erros.length > 0){
+    Categoria.findOne({
+      _id:id
+    })
+    .then(function(categoria){
+      res.render("admin/delete-categorias",{
+        erros,
+        categoria,
+      })
+    })
+    .catch(function(error){
+      req.flash("error_msg","Acabou acontecendo um erro")
+      res.redirect("/admin/categoria")
+    })
+  }
+  else if(excluir == "sim"){
+    Categoria.deleteOne({
+      _id:id
+    })
+    .then(function(categoria){
+      req.flash("success_msg","Categoria apagada com sucesso")
+      res.redirect("/admin/categorias")
+    })
+    .catch(function(error){
+      req.flash("error_msg","Erro ao apagar a categoria")
       res.redirect("/admin/categorias")
     })
   }
