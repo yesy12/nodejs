@@ -14,8 +14,82 @@ router.get("/",function(req,res){
   res.render("admin/index")
 })
 
-router.get("/posts",function(req,res){
-  res.send("Página de POSTS")
+router.get("/postagens",function(req,res){
+  res.render("admin/postagens")
+})
+
+router.get("/postagens/add",function(req,res){
+  Categoria.find().sort({
+    date:"desc"
+  })
+  .then(function(categorias){
+    res.render("admin/add-postagens",{
+      categorias,
+    })
+  })
+  .catch(function(error){
+    req.flash("error_msg","Aconteceu um erro ao criar categorias")
+    res.redirect("/admin/postagens")
+  })
+})
+
+router.post("/postagens/nova",function(req,res){
+  
+  const titulo = req.body.titulo;
+  const categoriaPostagem = req.body.categoriaPostagem;
+  const slugPostagem = req.body.slugPostagem;
+  const slugPostagemCompleto = req.body.slugPostagemCompleto;
+  const descricaoPostagem = req.body.descricaoPostagem;
+  const conteudoPostagem = req.body.conteudoPostagem;
+  
+  var erros = [];
+  
+  if(!titulo || typeof titulo == undefined || titulo == null){
+    erros.push({
+      texto:"Título Inválido"
+    })
+  }
+  
+  if( titulo.length < 10){
+    erros.push({
+      texto:"Título muito pequeno"
+    })  
+  }
+  
+  if(!categoriaPostagem || typeof categoriaPostagem == undefined || categoriaPostagem == null){
+      erros.push({
+        texto:"Categoria Inválida"
+    })
+  }
+  
+    Categoria.find({
+      slug:categoriaPostagem
+    })
+    .then(function(categoria){
+      
+    })
+    .catch(function(error){
+      erros.push({
+        texto:"Categoria não existe"
+      })
+    })
+  
+  /*
+  if(erros.length > 0){
+    Categoria.find().sort({
+      date:"desc"
+    })
+    .then(function(categorias){
+      res.render("admin/add-postagens",{
+        erros,
+        categorias,
+      })
+    })
+  }
+  else{
+    res.send(req.body)
+  }
+  */
 })
 
 router.get("/categorias",function(req,res){
