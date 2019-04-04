@@ -203,7 +203,8 @@ router.get("/postagens/editar/:id/:slug",function(req,res){
 })
 
 router.post("/postagens/edita",function(req,res){
-  
+
+  const id = req.body.id;
   const titulo = req.body.titulo;
   const categoriaPostagem = req.body.categoriaPostagem;
   const slugPostagem = req.body.slugPostagem;
@@ -305,11 +306,12 @@ router.post("/postagens/edita",function(req,res){
   }
   else{
     Postagem.findOne({
-      _id:req.body.id,
-      slug:req.body.slug
+      _id:id,
+      slug:slugPostagem
     })
     .then(function(postagem){
-    //  postagem.titulo= titulo;
+  
+      postagem.titulo= titulo;
       postagem.categoria = categoriaPostagem;
       postagem.slug = slugPostagem;
       postagem.slugCompleto = slugPostagemCompleto;
@@ -322,10 +324,11 @@ router.post("/postagens/edita",function(req,res){
         res.redirect("/admin/postagens")
       })
       .catch(function(error){
-        req.flash("error_msg","Houve um erro ao editar a postagem")
+        req.flash("error_msg","Houve um erro ao editar a postagem 2")
         console.log("erro: "+error)
         res.redirect("/admin/postagens")
       })
+     
     })
     .catch(function(error){
       req.flash("error_msg","Houve um erro ao editar a postagem")
