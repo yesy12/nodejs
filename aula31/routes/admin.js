@@ -2,7 +2,9 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 require("../models/Categoria")
+require("../models/Postagem")
 const Categoria = mongoose.model("categorias")
+const Postagem = mongoose.model("postagens")
 
 /*
   O req.flash não funcionava porque estava em modo 
@@ -44,18 +46,20 @@ router.post("/postagens/nova",function(req,res){
   
   var erros = [];
   
+  //Titulo
   if(!titulo || typeof titulo == undefined || titulo == null){
     erros.push({
       texto:"Título Inválido"
     })
   }
   
-  if( titulo.length < 10){
+  if(titulo.length > 0 && titulo.length < 10){
     erros.push({
       texto:"Título muito pequeno"
     })  
   }
   
+  //CategoriaPostagem
   if(!categoriaPostagem || typeof categoriaPostagem == undefined || categoriaPostagem == null){
       erros.push({
         texto:"Categoria Inválida"
@@ -74,7 +78,54 @@ router.post("/postagens/nova",function(req,res){
       })
     })
   
-  /*
+  //slugPostagem
+  if(!slugPostagem || typeof slugPostagem == undefined || slugPostagem == null){
+    erros.push({
+      texto:"Slug da Postagem Inválido"
+    })
+  }
+  
+  if(slugPostagem.length >0 && slugPostagem.length < 10){
+    erros.push({
+      texto:"Slug da postagem muito pequeno"
+    })  
+  }
+  
+  //slugPostagemCompleto
+  var verificarSlug = categoriaPostagem + "/" + slugPostagem
+  if(verificarSlug != slugPostagemCompleto){
+    erros.push({
+      texto:"O slug deve se digitado corretamente,com letras minusculas e com - entre os espaços"
+    })
+  }
+  console.log(verificarSlug)
+  
+  //DescricaoPostagem
+  if(!descricaoPostagem || typeof descricaoPostagem == undefined || descricaoPostagem == null){
+    erros.push({
+      texto:"Descrição da Postagem Inválido"
+    })
+  }
+  
+  if(descricaoPostagem.length >0 && descricaoPostagem.length < 10){
+    erros.push({
+      texto:"Descrição da postagem muito pequeno"
+    })  
+  }
+  
+  //ConteudoPostagem
+  if(!conteudoPostagem || typeof conteudoPostagem == undefined || conteudoPostagem == null){
+    erros.push({
+      texto:"Conteudo da Postagem Inválido"
+    })
+  }
+  
+  if(conteudoPostagem.length >0 && conteudoPostagem.length < 10){
+    erros.push({
+      texto:"Conteudo da postagem muito pequeno"
+    })  
+  }
+  
   if(erros.length > 0){
     Categoria.find().sort({
       date:"desc"
@@ -87,9 +138,26 @@ router.post("/postagens/nova",function(req,res){
     })
   }
   else{
-    res.send(req.body)
+    const novaPostagem = {
+      titulo,
+      categoria: categoriaPostagem,
+      slug: slugPostagemCompleto,
+      descricao: descricaoPostagem,
+      conteudo: conteudoPostagem
+    }
+    
+    new Postagem(novaPostagem).save()
+    .then(function(){
+      req.flash("success_msg","Postagem salva com sucesso")
+      res.redirect("/admin/postagens")
+    })
+    .catch(function(error){
+      req.flash("error_msg","Houve um erro ao salvar a postagem")
+      console.log("erro: "+error)
+      res.redirect("/admin/postagens")
+    })
   }
-  */
+  
 })
 
 router.get("/categorias",function(req,res){
