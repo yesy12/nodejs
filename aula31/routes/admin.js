@@ -17,7 +17,19 @@ router.get("/",function(req,res){
 })
 
 router.get("/postagens",function(req,res){
-  res.render("admin/postagens")
+  Postagem.find().sort({
+    data:"desc"
+  })
+  .then(function(postagens){
+     res.render("admin/postagens",{
+       postagens:postagens
+     })
+  })
+  .catch(function(error){
+    req.flash("error_msg","Houve um erro ao acessar a pagina de postagens")
+    res.redirect("/admin")
+  })
+ 
 })
 
 router.get("/postagens/add",function(req,res){
@@ -98,7 +110,6 @@ router.post("/postagens/nova",function(req,res){
       texto:"O slug deve se digitado corretamente,com letras minusculas e com - entre os espaços"
     })
   }
-  console.log(verificarSlug)
   
   //DescricaoPostagem
   if(!descricaoPostagem || typeof descricaoPostagem == undefined || descricaoPostagem == null){
