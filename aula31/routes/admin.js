@@ -4,6 +4,12 @@ const mongoose = require("mongoose");
 require("../models/Categoria")
 const Categoria = mongoose.model("categorias")
 
+/*
+  O req.flash não funcionava porque estava em modo 
+  de eventLoop do node, e o node executa tudo que esteja
+  fora do eventLoop primeiro.No caso era res.redirect()
+*/
+
 router.get("/",function(req,res){
   res.render("admin/index")
 })
@@ -72,14 +78,13 @@ router.post("/categorias/nova",function(req,res){
     new Categoria(novaCategoria).save().//Salvando no Db
     then(function(){
       req.flash("success_msg","Categoria salva com sucesso");
-      //console.log(req.flash("success_msg"))
-    }).catch(function(error){
+      res.redirect("/admin/categorias")
+    }).
+    catch(function(error){
       req.flash("error_msg","Houve um erro ao criar a categoria,tente novamente mais tarde")
       console.log("erro: "+error)
+      res.redirect("/admin/categorias")
     })
-    console.log(req.flash("success_msg") || req.flash("error_msg"))
-    res.redirect("/admin/categorias");
-
   }
 })
 
@@ -90,6 +95,10 @@ router.get("/categorias/editar/:id",function(req,res){
     res.render("admin/edit-categorias",{
       categoria:categoria
     })
+  }).catch(function(error){
+    console.log("ERRO: "+error)
+    req.flash("error_msg","Categoria Invalida")
+    res.redirect("/admin/categorias")
   })
   
 })
@@ -132,12 +141,11 @@ router.post("/categorias/edit",function(req,res){
       categoria.slug = slug
       
       req.flash("success_msg","Editado com sucesso")
+      res.redirect("/admin/categorias")
     }).catch(function(error){
       req.flash("error_msg","Houve um erro ao editar")
+      res.redirect("/admin/categorias")
     })
-    
-    res.redirect("/admin/categorias");
-
   }
 })
 
