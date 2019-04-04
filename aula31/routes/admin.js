@@ -339,6 +339,71 @@ router.post("/postagens/edita",function(req,res){
   
 })
 
+router.get("/postagens/delete/:id/:slug",function(req,res){
+  Postagem.findOne({
+    _id:req.params.id,
+    slug:req.params.slug
+  })
+  .then(function(postagem){
+    res.render("admin/delete-postagens",{
+      postagem:postagem
+    })
+  })
+  .catch(function(error){
+    req.flash("error_msg","Não existe essa postagem")
+    res.redirect("/admin/postagens")
+  })
+})
+
+router.post("/postagens/delete",function(req,res){
+  const id = req.body.id;
+  const slug = req.body.slug;
+  const excluir = req.body.excluir;
+  
+  var erros = [];
+  
+  if(excluir == "nao"){
+    req.flash("error_msg","Postagem não foi apagada")
+    res.redirect("/admin/postagens")
+  }
+  else if(excluir == null || !excluir || typeof excluir == undefined){
+    erros.push({
+      texto:"Decisão excluir invalida"
+    })
+  }
+  
+  if(erros.length > 0){
+    Postagem.findOne({
+      _id:id,
+      slug:slug
+    })
+    .then(function(postagem){
+      res.render("admin/delete-postagens",{
+        erros,
+        postagem,
+      })
+    })
+    .catch(function(error){
+      req.flash("error_msg","Acabou acontecendo um erro")
+      res.redirect("/admin/postagens")
+    })
+  }
+  else if(excluir == "sim"){
+    Postagem.deleteOne({
+      _id:id,
+      slug:slug
+    })
+    .then(function(postagem){
+      req.flash("success_msg","Postagem apagada com sucesso")
+      res.redirect("/admin/postagens")
+    })
+    .catch(function(error){
+      req.flash("error_msg","Erro ao apagar a postagem")
+      res.redirect("/admin/postagens")
+    })
+  }
+})
+
 router.get("/categorias",function(req,res){
   Categoria.find().sort({
     date:"desc"
