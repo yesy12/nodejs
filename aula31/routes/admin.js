@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
+//Models
 require("../models/Categoria")
 require("../models/Postagem")
 const Categoria = mongoose.model("categorias")
@@ -16,20 +17,21 @@ router.get("/",function(req,res){
   res.render("admin/index")
 })
 
+//Postagens
 router.get("/postagens",function(req,res){
-  Postagem.find().sort({
+  //populate buscar outras informações do campo,tipo nome
+  Postagem.find().populate("categoria")
+  .sort({
     data:"desc"
+  }).then(function(postagens){
+    res.render("admin/postagens",{
+      postagens:postagens
+    })
   })
-  .then(function(postagens){
-     res.render("admin/postagens",{
-       postagens:postagens
-     })
-  })
-  .catch(function(error){
+ .catch(function(error){
     req.flash("error_msg","Houve um erro ao acessar a pagina de postagens")
     res.redirect("/admin")
   })
- 
 })
 
 router.get("/postagens/add",function(req,res){
@@ -77,19 +79,7 @@ router.post("/postagens/nova",function(req,res){
         texto:"Categoria Inválida"
     })
   }
-  
-    Categoria.find({
-      slug:categoriaPostagem
-    })
-    .then(function(categoria){
-      
-    })
-    .catch(function(error){
-      erros.push({
-        texto:"Categoria não existe"
-      })
-    })
-  
+    
   //slugPostagem
   if(!slugPostagem || typeof slugPostagem == undefined || slugPostagem == null){
     erros.push({
@@ -176,7 +166,7 @@ router.get("/postagens/editar/:id/:slug",function(req,res){
   Postagem.findOne({
     _id:req.params.id,
     slug:req.params.slug
-  })
+  }).populate("categoria")
   
   .then(function(postagem){
     console.log(postagem)
@@ -234,17 +224,6 @@ router.post("/postagens/edita",function(req,res){
     })
   }
   
-    Categoria.find({
-      slug:categoriaPostagem
-    })
-    .then(function(categoria){
-      
-    })
-    .catch(function(error){
-      erros.push({
-        texto:"Categoria não existe"
-      })
-    })
   
   //slugPostagem
   if(!slugPostagem || typeof slugPostagem == undefined || slugPostagem == null){
@@ -404,6 +383,7 @@ router.post("/postagens/delete",function(req,res){
   }
 })
 
+//Categorias
 router.get("/categorias",function(req,res){
   Categoria.find().sort({
     date:"desc"
