@@ -51,7 +51,7 @@
 //Rotas
   //Rotas do Caminho normal
   app.get("/",function(req,res){
-    res.send("Rota Principal")
+    res.render("index")
   })
   
   app.get("/posts",function(req,res){

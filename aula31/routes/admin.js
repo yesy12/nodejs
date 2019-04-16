@@ -24,7 +24,7 @@ router.get("/postagens",function(req,res){
   .sort({
     data:"desc"
   }).then(function(postagens){
-    res.render("admin/postagens",{
+    res.render("admin/postagens/index",{
       postagens:postagens
     })
   })
@@ -39,13 +39,13 @@ router.get("/postagens/add",function(req,res){
     date:"desc"
   })
   .then(function(categorias){
-    res.render("admin/add-postagens",{
+    res.render("admin/postagens/add-postagens",{
       categorias,
     })
   })
   .catch(function(error){
     req.flash("error_msg","Aconteceu um erro ao criar categorias")
-    res.redirect("/admin/postagens")
+    res.redirect("/admin/postagens/")
   })
 })
 
@@ -132,7 +132,7 @@ router.post("/postagens/nova",function(req,res){
       date:"desc"
     })
     .then(function(categorias){
-      res.render("admin/add-postagens",{
+      res.render("admin/postagens/add-postagens",{
         erros,
         categorias,
       })
@@ -151,12 +151,12 @@ router.post("/postagens/nova",function(req,res){
     new Postagem(novaPostagem).save()
     .then(function(){
       req.flash("success_msg","Postagem salva com sucesso")
-      res.redirect("/admin/postagens")
+      res.redirect("/admin/postagens/")
     })
     .catch(function(error){
       req.flash("error_msg","Houve um erro ao salvar a postagem")
       console.log("erro: "+error)
-      res.redirect("/admin/postagens")
+      res.redirect("/admin/postagens/")
     })
   }
   
@@ -169,12 +169,11 @@ router.get("/postagens/editar/:id/:slug",function(req,res){
   }).populate("categoria")
   
   .then(function(postagem){
-    console.log(postagem)
     Categoria.find().sort({
       data:"desc"
     })
     .then(function(categorias){
-      res.render("admin/edit-postagens",{
+      res.render("admin/postagens/edit-postagens",{
         postagem:postagem,
         categorias:categorias
       })
@@ -187,7 +186,7 @@ router.get("/postagens/editar/:id/:slug",function(req,res){
   })
   .catch(function(error){
     req.flash("error_msg","Essa categoria não existe")
-    res.redirect("/admin/postagens")
+    res.redirect("/admin/postagens/postagens")
   })
   
 })
@@ -277,7 +276,7 @@ router.post("/postagens/edita",function(req,res){
       date:"desc"
     })
     .then(function(categorias){
-      res.render("admin/add-postagens",{
+      res.render("admin/postagens/add-postagens",{
         erros,
         categorias,
       })
@@ -289,7 +288,7 @@ router.post("/postagens/edita",function(req,res){
       slug:slugPostagem
     })
     .then(function(postagem){
-  
+
       postagem.titulo= titulo;
       postagem.categoria = categoriaPostagem;
       postagem.slug = slugPostagem;
@@ -300,12 +299,12 @@ router.post("/postagens/edita",function(req,res){
       postagem.save()  
       .then(function(){
         req.flash("success_msg","Postagem editada com sucesso")
-        res.redirect("/admin/postagens")
+        res.redirect("/admin/postagens/")
       })
       .catch(function(error){
         req.flash("error_msg","Houve um erro ao editar a postagem 2")
         console.log("erro: "+error)
-        res.redirect("/admin/postagens")
+        res.redirect("/admin/postagens/")
       })
      
     })
@@ -324,13 +323,13 @@ router.get("/postagens/delete/:id/:slug",function(req,res){
     slug:req.params.slug
   })
   .then(function(postagem){
-    res.render("admin/delete-postagens",{
+    res.render("admin/postagens/delete-postagens",{
       postagem:postagem
     })
   })
   .catch(function(error){
     req.flash("error_msg","Não existe essa postagem")
-    res.redirect("/admin/postagens")
+    res.redirect("/admin/postagens/")
   })
 })
 
@@ -357,14 +356,14 @@ router.post("/postagens/delete",function(req,res){
       slug:slug
     })
     .then(function(postagem){
-      res.render("admin/delete-postagens",{
+      res.render("admin/postagens/delete-postagens",{
         erros,
         postagem,
       })
     })
     .catch(function(error){
       req.flash("error_msg","Acabou acontecendo um erro")
-      res.redirect("/admin/postagens")
+      res.redirect("/admin/postagens/postagens")
     })
   }
   else if(excluir == "sim"){
@@ -374,11 +373,11 @@ router.post("/postagens/delete",function(req,res){
     })
     .then(function(postagem){
       req.flash("success_msg","Postagem apagada com sucesso")
-      res.redirect("/admin/postagens")
+      res.redirect("/admin/postagens/")
     })
     .catch(function(error){
       req.flash("error_msg","Erro ao apagar a postagem")
-      res.redirect("/admin/postagens")
+      res.redirect("/admin/postagens/")
     })
   }
 })
@@ -389,7 +388,7 @@ router.get("/categorias",function(req,res){
     date:"desc"
   }).
   then(function(categorias){
-     res.render("admin/categorias",{
+     res.render("admin/categorias/index",{
        categorias:categorias
      })
   })
@@ -401,7 +400,7 @@ router.get("/categorias",function(req,res){
 })
 
 router.get("/categorias/add",function(req,res){
-  res.render("admin/add-categorias")
+  res.render("admin/categorias/add-categorias")
 })
 
 router.post("/categorias/nova",function(req,res){
@@ -458,7 +457,7 @@ router.get("/categorias/editar/:id",function(req,res){
   Categoria.findOne({
     _id:req.params.id
   }).then(function(categoria){
-    res.render("admin/edit-categorias",{
+    res.render("admin/categorias/edit-categorias",{
       categoria:categoria
     })
   }).catch(function(error){
@@ -526,8 +525,14 @@ router.get("/categorias/delete/:id",function(req,res){
     _id:req.params.id
   }).
   then(function(categoria){
-    res.render("admin/delete-categorias",{
-      categoria:categoria
+    Postagem.find({
+      categoria: req.params.id
+    }).populate("categoria")
+    .then(function(postagens){
+      res.render("admin/categorias/delete-categorias",{
+        categoria:categoria,
+        postagens:postagens
+      })
     })
   })
   .catch(function(error){
@@ -537,8 +542,9 @@ router.get("/categorias/delete/:id",function(req,res){
 })
 
 router.post("/categorias/delete",function(req,res){
-  const id = req.body.id
+  const id = req.body.idCategoria
   const excluir = req.body.excluir
+  const semPostagem = req.body.semPostagem || "não";
   
   var erros = [];
   
@@ -557,7 +563,7 @@ router.post("/categorias/delete",function(req,res){
       _id:id
     })
     .then(function(categoria){
-      res.render("admin/delete-categorias",{
+      res.render("admin/categorias/delete-categorias",{
         erros,
         categoria,
       })
@@ -567,18 +573,46 @@ router.post("/categorias/delete",function(req,res){
       res.redirect("/admin/categoria")
     })
   }
-  else if(excluir == "sim"){
-    Categoria.deleteOne({
-      _id:id
+  else if(excluir == "sim"  && semPostagem == "não"){
+    Postagem.find({
+      categoria:id
+    }).deleteMany()
+    //then Postagem
+    .then(function(){
+      Categoria.deleteOne({
+        _id:id
+      })
+      //then Categoria
+      .then(function(){
+        req.flash("success_msg","A Categoria e postagens da mesma foram apagadas")
+        res.redirect("/admin/categorias")
+      })
+      //catch Categoria
+      .catch(function(error){
+        req.flash("error_msg","As postagens foram apagadas mas a categoria não")
+        res.redirect("/admin/categorias")
+      })
     })
-    .then(function(categoria){
-      req.flash("success_msg","Categoria apagada com sucesso")
-      res.redirect("/admin/categorias")
-    })
+    //catch Postagem
     .catch(function(error){
-      req.flash("error_msg","Erro ao apagar a categoria")
+      req.flash("error_msg","As postagens e categorias não foram apagadas")
       res.redirect("/admin/categorias")
     })
+  }
+  else if(excluir == "sim"  && semPostagem == "sim"){
+      Categoria.deleteOne({
+        _id:id
+      })
+      //then categoria
+      .then(function(){
+        req.flash("success_msg","A Categoria foi apagada,e as postagens não existe")
+        res.redirect("/admin/categorias")
+      })
+      //catch Categoria
+      .catch(function(error){
+        req.flash("error_msg","A Categoria não foi apagada,e as postagens não existem")
+        res.redirect("/admin/categorias")
+      })
   }
 })
 
