@@ -3,6 +3,7 @@
   const handlebars = require("express-handlebars");
   const bodyParser = require("body-parser");
   const app = express();
+  //rotas com configurações admin
   const admin = require("./routes/admin")
   const path = require("path")
   const mongoose = require("mongoose");
@@ -54,7 +55,7 @@
     res.render("index")
   })
   
-  app.get("/posts",function(req,res){
+  app.get("/postagens",function(req,res){
     res.send("Lista de Posts")
   })
   
