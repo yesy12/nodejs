@@ -13,6 +13,7 @@
   require("./models/Categoria")
   const Postagem = mongoose.model("postagens")
   const Categoria = mongoose.model("categorias")  
+  
 //Config
   //Session
     app.use(session({
@@ -56,7 +57,7 @@
   //Rotas do Caminho normal
   app.get("/",function(req,res){
     Postagem.find().populate("categoria").sort({
-      date:"desc"
+      data:"desc"
     })
     .then(function(postagens) {
       res.render("index",{
@@ -79,7 +80,7 @@
     }).populate("categoria")
     .then(function(postagem){
       if(postagem){
-        res.render("postagem/index",{
+        res.render("user/postagem/index",{
           postagem:postagem
         })
       }
@@ -94,12 +95,61 @@
     })
   })
   
-  app.get("/postagens",function(req,res){
-    res.send("Lista de Posts")
+  app.get("/categorias",function(req,res){
+    Categoria.find().sort({
+      data:"desc"
+    })
+    .then(function(categorias){
+      res.render("user/categorias/index",{
+        categorias:categorias
+      })
+    })
+    .catch(function(error){
+      console.log(error)
+      req.flash("error_msg","Houve um erro interno ao listar categorias")
+      res.redirect("/")
+    })
   })
   
-  app.get("/categorias",function(req,res){
-    res.send("Lista de Categorias")
+  app.get("/categoria/:slug",function(req,res){
+    Categoria.findOne({
+      slug:req.params.slug
+    })
+    .sort({
+      data:"desc"
+    })
+    .then(function(categoria){
+    //then Categoria
+      if(categoria){
+        
+        Postagem.find({
+          categoria:categoria._id
+        }).populate("categoria")
+        //then Postagem
+        .then(function(postagens){
+          res.render("user/categorias/postagens",{
+            postagens:postagens,
+            categoria:categoria
+          })
+        })
+        //catch Postagem
+        .catch(function(error){
+          console.log(error+" /categoria/:slug Postagem.find")
+          req.flash("error_msg","Houve um erro ao listar as postagens")
+          res.redirect("/")
+        })
+      }
+      else{
+        req.flash("error_msg","Não existe essa categoria")
+        res.redirect("/")
+      }
+    })
+    //catch Categoria
+    .catch(function(erro){
+      console.log(erro+" /categoria/:slug Categoria.findOne")
+      req.flash("error_msg","Houve um erro interno ao listar os posts da categoria")
+      res.redirect("/")
+    })
   })
   
   //Rotas do caminhos Admin
