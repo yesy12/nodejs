@@ -9,7 +9,10 @@
   const mongoose = require("mongoose");
   const session = require("express-session");
   const flash = require("connect-flash");
-  
+  require("./models/Postagem")
+  require("./models/Categoria")
+  const Postagem = mongoose.model("postagens")
+  const Categoria = mongoose.model("categorias")  
 //Config
   //Session
     app.use(session({
@@ -52,7 +55,43 @@
 //Rotas
   //Rotas do Caminho normal
   app.get("/",function(req,res){
-    res.render("index")
+    Postagem.find().populate("categoria").sort({
+      date:"desc"
+    })
+    .then(function(postagens) {
+      res.render("index",{
+        postagens:postagens
+      })
+    })
+    .catch(function(error){
+      req.flash("error_msg","Houve um erro interno")
+      res.redirect("/404")
+    })
+  })
+  
+  app.get("/404",function(req,res){
+    res.send("Erro 404")  
+  })
+  
+  app.get("/postagem/:slug",function(req,res){
+    Postagem.findOne({
+      slug:req.params.slug
+    }).populate("categoria")
+    .then(function(postagem){
+      if(postagem){
+        res.render("postagem/index",{
+          postagem:postagem
+        })
+      }
+      else{
+        req.flash("error_msg","Esta postagem não existe")
+        res.redirect("/")
+      }
+    })
+    .catch(function(error){
+      req.flash("error_msg","Erro interno")
+      res.redirect("/")
+    })
   })
   
   app.get("/postagens",function(req,res){
