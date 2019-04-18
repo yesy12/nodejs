@@ -1,0 +1,32 @@
+<h1>{{categoria.nome}}</h1><br>
+<h2>Postagens Recentes:</h2>
+
+{{#each postagens}}
+  <div class="card mt-3">
+    <div class="card-body ">
+      <h3>{{titulo}}</h3>
+      <p>{{descricao}}</p>
+      <a href="/postagem/{{slug}}">
+        <button class="btn btn-primary">Leia mais</button>
+      </a>
+      <hr>
+      <small class="categoria">{{categoria.nome}}</small>
+      <small class="data">Data de criação: {{data}}</small>
+    </div>
+  </div>
+{{else}}
+  <h5>Sem postagens</h5>
+{{/each}}
+<br>
+<style>
+  .categoria{
+    top:-10px;
+    left:600px;
+    position:absolute;
+  }
+ /* .data{
+    position:absolute;
+    top:165px;
+    left:300px;
+  }*/
+</style
