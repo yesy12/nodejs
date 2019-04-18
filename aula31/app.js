@@ -1,14 +1,18 @@
 //Modulos
+  //Principal do Site
   const express = require("express");
   const handlebars = require("express-handlebars");
   const bodyParser = require("body-parser");
   const app = express();
-  //rotas com configurações admin
+  //rotas
   const admin = require("./routes/admin")
-  const path = require("path")
+  const usuario = require("./routes/usuario")
+  
+  const path = require("path");
   const mongoose = require("mongoose");
   const session = require("express-session");
   const flash = require("connect-flash");
+  //Model
   require("./models/Postagem")
   require("./models/Categoria")
   const Postagem = mongoose.model("postagens")
@@ -154,7 +158,7 @@
   
   //Rotas do caminhos Admin
   app.use("/admin",admin);
-  
+  app.use("/usuarios",usuario);
   
 //Outros
   const port = 9000; 
