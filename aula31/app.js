@@ -12,11 +12,17 @@
   const mongoose = require("mongoose");
   const session = require("express-session");
   const flash = require("connect-flash");
+  
+  const passport = require("passport")
+  require("./config/auth")(passport)
+  
   //Model
   require("./models/Postagem")
   require("./models/Categoria")
   const Postagem = mongoose.model("postagens")
   const Categoria = mongoose.model("categorias")  
+  
+
   
 //Config
   //Session
@@ -25,6 +31,11 @@
       resave:true,
       saveUninitialized:true
     }))
+    
+    app.use(passport.initialize())
+    app.use(passport.session())
+    
+    
     app.use(flash());
     
   //Middleware
@@ -32,6 +43,8 @@
       res.locals.success_msg = req.flash("success_msg");
       //variaveis globais
       res.locals.error_msg = req.flash("error_msg");
+      res.locals.error = req.flash("error")
+      res.locals.user = req.user || null;
       next();
     })
     

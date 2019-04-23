@@ -7,18 +7,19 @@ require("../models/Postagem")
 const Categoria = mongoose.model("categorias")
 const Postagem = mongoose.model("postagens")
 
+const isAdmin = require("../helpers/isAdmin")
 /*
   O req.flash não funcionava porque estava em modo 
   de eventLoop do node, e o node executa tudo que esteja
   fora do eventLoop primeiro.No caso era res.redirect()
 */
 
-router.get("/",function(req,res){
+router.get("/", function(req,res){
   res.render("admin/index")
 })
 
 //Postagens
-router.get("/postagens",function(req,res){
+router.get("/postagens", function(req,res){
   //populate buscar outras informações do campo,tipo nome
   Postagem.find().populate("categoria")
   .sort({
@@ -34,7 +35,7 @@ router.get("/postagens",function(req,res){
   })
 })
 
-router.get("/postagens/add",function(req,res){
+router.get("/postagens/add", function(req,res){
   Categoria.find().sort({
     date:"desc"
   })

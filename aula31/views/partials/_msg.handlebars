@@ -1,12 +1,19 @@
 {{#if success_msg}}
-   <div class="alert alert-success">
+  <div class="alert alert-success">
     Situação:&nbsp; {{success_msg}}
-   </div>
+  </div>
 {{/if}}
 
 {{#if error_msg}}
-   <div class="alert alert-danger">
+  <div class="alert alert-danger">
     Situação:&nbsp;{{error_msg}}
-   </div>
+  </div>
+
+{{/if}}
+
+{{#if error}}
+  <div class="alert alert-danger">
+    Situação:&nbsp;{{error}}
+  </div>
 
 {{/if}}
