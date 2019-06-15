@@ -58,7 +58,8 @@
     
   //Mongoose
     mongoose.Promise = global.Promise;
-    mongoose.connect("mongodb://localhost/blogapp",   {useNewUrlParser: true }).
+	const link = "mongodb+srv://express:<password>@cluster0-nth3w.mongodb.net/test?retryWrites=true&w=majority"
+    mongoose.connect(link,   {useNewUrlParser: true }).
     then(function(){
       console.log("Conectado ao MongoDB")
     }).catch(function(error){

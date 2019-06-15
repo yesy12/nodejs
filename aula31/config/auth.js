@@ -2,7 +2,7 @@ const localStrategy = require("passport-local").Strategy;
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
-//MOdel de usuario
+//Model de usuario
 require("../models/Usuario")
 const Usuario = mongoose.model("usuarios")
 
@@ -16,10 +16,10 @@ module.exports = function(passport){
       function(email,senha,done){
       
         Usuario.findOne({
-        email:email
-      })
+			email:email
+		})
           
-          .then(function(usuario){
+        .then(function(usuario){
           
             if(!usuario){
 
@@ -50,7 +50,7 @@ module.exports = function(passport){
             }//else
           })//then function(usuario)
             
-          .catch(function(error){
+        .catch(function(error){
             
             console.log(error+" auth.js Usuario.findOne")
             req.flash("error_msg","Erro no nosso sistema")
